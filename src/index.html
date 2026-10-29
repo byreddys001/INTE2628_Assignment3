@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Decision Voting Application</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Community Decision Voting Application</h1>
+      <p>Commit–reveal voting on Ethereum Sepolia</p>
+    </header>
+
+    <!-- Wallet, role, phase and action guidance -->
+    <section class="card">
+      <h2>Wallet and Election</h2>
+      <button id="connectButton">Connect MetaMask</button>
+
+      <div class="info-grid">
+        <p><strong>Wallet:</strong> <span id="walletAddress">Not connected</span></p>
+        <p><strong>Role:</strong> <span id="userRole">-</span></p>
+        <p><strong>Network:</strong> <span id="networkInfo">-</span></p>
+        <p><strong>Phase:</strong> <span id="votingStatus">-</span></p>
+        <p><strong>Election ID:</strong> <span id="electionIdDisplay">-</span></p>
+        <p><strong>Topic:</strong> <span id="topicDisplay">-</span></p>
+      </div>
+
+      <div id="phaseTrack" class="phase-track" aria-label="Election phases"></div>
+
+      <div id="roleNotice" class="message" role="status">
+        Connect MetaMask to continue.
+      </div>
+
+      <div id="actionGuide" class="guide-grid"></div>
+
+      <div id="globalMessage" class="message" role="status"></div>
+    </section>
+
+    <section class="card">
+      <h2>Election Options</h2>
+      <div id="optionsDisplay">Connect your wallet to load the election.</div>
+    </section>
+
+    <!-- Voter panel -->
+    <section class="card" id="voterPanel">
+      <h2>Participant Voting</h2>
+      <p class="small">
+        For eligible voter wallets. If your wallet or the current phase does not
+        allow an action, the smart contract rejects it and the reason is shown.
+      </p>
+
+      <p><strong>Eligibility:</strong> <span id="eligibilityStatus">-</span></p>
+      <p><strong>Commitment submitted:</strong> <span id="commitStatus">-</span></p>
+      <p><strong>Vote revealed:</strong> <span id="revealStatus">-</span></p>
+
+      <div id="voteOptions"></div>
+      <button id="commitButton">Submit Secret Commitment</button>
+
+      <hr>
+
+      <h3>Reveal Your Vote</h3>
+      <p class="small">
+        Reveal only after the Admin ends voting. Your receipt contains the option
+        and secret salt needed to validate your commitment. Keep it private.
+      </p>
+
+      <button id="revealButton">Reveal and Validate My Vote</button>
+
+      <div class="button-row">
+        <button id="receiptButton" class="secondary">Show My Private Receipt</button>
+        <button id="downloadReceiptButton" class="secondary">Download Receipt</button>
+      </div>
+      <div id="receiptDisplay" class="result-box"></div>
+
+      <h3>Restore a Receipt</h3>
+      <p class="small">
+        Using a different browser? Paste a receipt you downloaded earlier.
+        It is checked against your wallet and the election before it is saved.
+      </p>
+      <textarea id="receiptImport" rows="4" placeholder="Paste receipt JSON here"></textarea>
+      <button id="importReceiptButton" class="secondary">Import Receipt</button>
+
+      <div id="voterMessage" class="message" role="status"></div>
+    </section>
+
+    <!-- Admin panel -->
+    <section class="card" id="adminControls">
+      <h2>Admin Controls</h2>
+      <p class="small">
+        Only the Admin wallet can use these actions. The smart contract rejects
+        any other wallet and any action in the wrong phase.
+      </p>
+
+      <h3>Prepare an Election</h3>
+      <label for="topicInput">Election topic</label>
+      <input id="topicInput" type="text" placeholder="Enter the election topic">
+
+      <label for="optionsInput">Options (one per line)</label>
+      <textarea id="optionsInput" rows="4"
+        placeholder="Option A&#10;Option B"></textarea>
+
+      <button id="prepareButton">Start New Election</button>
+
+      <h3>Manage Eligibility</h3>
+      <p class="small">
+        Add participant wallet addresses during the Commit phase.
+        Only addresses on the eligibility list can vote, and only once per election.
+      </p>
+
+      <label for="eligibilityAddress">Participant wallet address</label>
+      <input id="eligibilityAddress" type="text" placeholder="0x...">
+
+      <div class="button-row">
+        <button id="addEligibleButton">Add Eligible Participant</button>
+        <button id="removeEligibleButton" class="secondary">Remove Eligible Participant</button>
+        <button id="eligibleListButton" class="secondary">View Eligible Participants</button>
+      </div>
+
+      <div id="eligibleListResult" class="result-box"></div>
+
+      <h3>Optional Exclusion Controls</h3>
+      <p class="small">
+        Excluding a participant blocks them from voting. Reinstating them removes
+        the exclusion but does not add them back to the eligibility list.
+      </p>
+
+      <div class="button-row">
+        <button id="excludeButton">Exclude Participant</button>
+        <button id="reinstateButton" class="secondary">Remove Exclusion</button>
+        <button id="excludedListButton" class="secondary">View Excluded List</button>
+      </div>
+
+      <div id="excludedListResult" class="result-box"></div>
+
+      <h3>Election Lifecycle</h3>
+      <div class="button-row">
+        <button id="endButton">End Voting</button>
+        <button id="finaliseButton">Finalise Results</button>
+        <button id="resetButton" class="secondary">Reset Finished Election</button>
+      </div>
+
+      <p class="small">
+        End voting before participants reveal. Finalisation publishes the vote counts,
+        the audit list and a result hash on-chain. Participants who do not reveal are
+        recorded as not revealed and are not counted. After finalising, you can start
+        a new election directly or reset to Setup first. Past results are always kept.
+      </p>
+
+      <div id="adminMessage" class="message" role="status"></div>
+    </section>
+
+    <section class="card">
+      <h2>Published Results and Audit</h2>
+      <p class="small">
+        Leave the election ID empty to load the current election's results.
+        Enter a previous election ID to view its saved results and audit.
+        Results are available only after finalisation.
+      </p>
+
+      <label for="historyElectionId">Election ID (optional)</label>
+      <input id="historyElectionId" type="number" min="1" placeholder="For example, 1">
+
+      <div class="button-row">
+        <button id="loadResultsButton" class="secondary">Load Results</button>
+        <button id="loadAuditButton" class="secondary">Load Audit Records</button>
+      </div>
+
+      <p id="resultsStatus">Results have not been loaded.</p>
+      <div id="resultsDisplay" class="result-box"></div>
+      <div id="auditDisplay" class="result-box"></div>
+    </section>
+
+    <footer>
+      <p>Developing Blockchain Applications — Assignment 3</p>
+    </footer>
+  </main>
+
+  <script src="web3.min.js"></script>
+  <script src="application.js"></script>
+</body>
+</html>

@@ -1,179 +1,41 @@
-# Community Decision Voting Platform
-
 ## INTE2628/2679 – Developing Blockchain Applications
-### Assignment 2 – Decision Voting Platform
+### Assignment 3 – Final Block chain Application
 
-A browser-based blockchain voting platform built using Solidity, Web3.js, MetaMask and the Ethereum Sepolia test network.
+# Community Decision Voting dApp (Assignment 3)
 
-The application allows an Admin to create and manage voting rounds while the participants can connect their MetaMask wallets, view the current voting session, cast one vote, view their own vote, and receive feedback about their eligibility and voting status.
+A commit–reveal voting app on Ethereum Sepolia. Voters first submit a hidden hash of their vote, then reveal it once voting closes, and the smart contract only counts votes that match.
 
----
+## Files
+- `contract.sol` – Solidity smart contract (all the voting rules live here)
+- `index.html` – the web page
+- `application.js` – Web3.js code that talks to MetaMask and the contract
+- `styles.css` – basic styling
+- `web3.min.js` – Web3.js library
 
-## 1. Project Overview
+## How to run
+1. Open `contract.sol` in Remix, compile it, and deploy it on **Sepolia** using Injected Provider (MetaMask). The wallet you deploy with becomes the Admin.
+2. Copy the deployed contract address into `CONTRACT_ADDRESS` at the top of `application.js`.
+3. Open `index.html` in a browser (or use a local server), connect MetaMask on Sepolia, and you're in.
 
-The Community Decision Voting Platform is a decentralised voting application designed to support repeated decision-making activities.
+You'll need some Sepolia ETH in each wallet you use.
 
-The smart contract manages:
+## How an election works
+1. **Setup** – Admin starts an election with a topic and options.
+2. **Commit** – Admin adds eligible voters. Each voter picks an option and submits a hidden hash. The page saves a private receipt (option + salt), so keep it.
+3. **Reveal** – Admin ends voting. Voters reveal using their receipt, and the contract checks it matches their hash.
+4. **Finalized** – Admin publishes results. Anyone can view the counts, winners, audit list and the verification check.
+5. **New election** – Admin can start a new one (or reset first). Old results stay stored.
 
-- Admin assignment
-- Voting round preparation
-- Text-based voting options
-- Participant eligibility
-- Voting
-- Duplicate-vote prevention
-- Ending voting
-- Result revelation
-- Winner calculation
-- Result viewing
-- Resetting the voting round
+## Roles
+- **Admin** – manages the election and the voter list. Can't vote.
+- **Voter** – must be on the eligible list and not excluded. One vote per election.
+- **Anyone** – can view results and the audit once they're published.
 
-The frontend provides a single-page interface that connects to the deployed smart contract through MetaMask and Web3.js.
+## Good to know
+- The contract enforces all the rules. The page only shows things and sends transactions, so buttons stay clickable to show the contract rejecting wrong actions.
+- Don't lose your receipt. Without it you can't reveal your vote.
+- Choices become public once voters reveal. Privacy covers the voting phase only.
+- There's no reveal deadline, so ask voters to reveal before the Admin finalises. Anyone who hasn't revealed is recorded as "not revealed" and isn't counted.
 
----
-
-## 2. Technologies Used
-
-- **Solidity** – Smart contract development
-- **Web3.js** – Frontend-to-blockchain communication
-- **MetaMask** – Wallet connection and transaction confirmation
-- **Ethereum Sepolia Testnet** – Blockchain network
-- **HTML** – Frontend structure
-- **CSS** – Interface styling
-- **JavaScript** – Frontend logic
-- **Remix IDE** – Smart contract compilation and deployment
-
----
-
-## 3. Project Structure
-
-```text
-src/
-├── application.js       # Frontend JavaScript and Web3.js interaction
-├── contract.sol         # CommunityVoting smart contract
-├── index.html           # Main browser interface
-├── styles.css           # Frontend styling
-├── web3.min.js          # Web3.js library
-└── README.md            # Project documentation
-
----
-
-## 4. Main Features
-
-### Admin
-
-- Prepare a voting round
-- Set the voting topic and options
-- Exclude and reinstate participants
-- View the excluded participant list
-- Check participant voting status
-- End voting
-- Reveal results
-- Reset the voting round
-- Admin cannot vote
-
-### Participants
-
-- Connect MetaMask wallet
-- View the voting topic and options
-- Check eligibility
-- Cast one vote per round
-- View their own vote
-- View results after they are revealed
-
----
-
-## 5. Voting Lifecycle
-
-```text
-Prepare Voting Round
-        ↓
-Voting Active
-        ↓
-Participants Vote
-        ↓
-End Voting
-        ↓
-Reveal Results
-        ↓
-View Results
-        ↓
-Reset Voting Round
-        ↓
-New Voting Round
-```
-
----
-
-## 6. Running the Application
-
-### Step 1 - Deploy the Smart Contract
-
-Open `contract.sol` in Remix IDE.
-
-Use:
-
-```text
-Environment: Browser Extension / MetaMask
-Network: Sepolia
-Contract: CommunityVoting
-```
-
-Deploy the contract using the Admin MetaMask account.
-
-The account that deploys the contract automatically becomes the Admin.
-
-### Step 2 - Configure the Frontend
-
-Open `application.js` and replace:
-
-```javascript
-const CONTRACT_ADDRESS = "0xcB6AB1AE0A8F3EC95D52a7908fA891d026880871";
-```
-
-with the deployed contract address.
-
-### Step 3 - Run the Application
-
-Open `index.html` using a local web server such as VS Code Live Server.
-
-Connect MetaMask and select the Sepolia network.
-
----
-
-## 7. Testing
-
-The application can be tested using separate MetaMask accounts for the Admin and participants.
-
-1. Admin prepares a voting round.
-2. Admin manages participant eligibility.
-3. Participants connect their wallets.
-4. Participants cast their votes.
-5. Participants can view their own vote.
-6. Duplicate voting is prevented.
-7. Admin ends voting.
-8. Admin reveals the results.
-9. Results display all options and vote counts.
-10. Admin resets the voting round.
-
----
-
-## 8. Network
-
-**Ethereum Sepolia Testnet**
----
-
-## 9. Contract Address
-
-```text
-0xcB6AB1AE0A8F3EC95D52a7908fA891d026880871
-```
-
----
-
-## 10. Team
-
-**Member 1:** Valentino Osorio Schwarz - s4091514 
-
-**Member 2:** Byreddy Srilekha - s4076074
-
-**Canvas Submitter:** Valentino Osorio Schwarz - s4091514
+## Tools
+Solidity, Remix, MetaMask, Web3.js, HTML, JavaScript.

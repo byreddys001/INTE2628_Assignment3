@@ -18,6 +18,8 @@
       <h2>Wallet and Election</h2>
       <button id="connectButton">Connect MetaMask</button>
 
+      <!-- Page layout: wallet and phase info at the top, then voter panel, admin panel, results.
+     All the logic is in application.js, this file is just structure. -->
       <div class="info-grid">
         <p><strong>Wallet:</strong> <span id="walletAddress">Not connected</span></p>
         <p><strong>Role:</strong> <span id="userRole">-</span></p>
@@ -43,7 +45,9 @@
       <div id="optionsDisplay">Connect your wallet to load the election.</div>
     </section>
 
-    <!-- Voter panel -->
+   
+   <!-- Voter panel: commit, reveal and receipt tools. Buttons stay clickable on purpose,
+     so wrong actions show the contract rejecting them. -->
     <section class="card" id="voterPanel">
       <h2>Participant Voting</h2>
       <p class="small">
@@ -103,6 +107,7 @@
 
       <button id="prepareButton">Start New Election</button>
 
+      <!-- Eligibility: add/remove voters from the list, Commit phase only. -->
       <h3>Manage Eligibility</h3>
       <p class="small">
         Add participant wallet addresses during the Commit phase.
@@ -120,6 +125,7 @@
 
       <div id="eligibleListResult" class="result-box"></div>
 
+      <!-- Exclusion: blocks someone without removing them from the list. -->
       <h3>Optional Exclusion Controls</h3>
       <p class="small">
         Excluding a participant blocks them from voting. Reinstating them removes
@@ -133,6 +139,8 @@
       </div>
 
       <div id="excludedListResult" class="result-box"></div>
+
+      <!-- Lifecycle buttons: end voting, finalise, reset. Each only works in the right phase. -->
 
       <h3>Election Lifecycle</h3>
       <div class="button-row">
@@ -151,6 +159,8 @@
       <div id="adminMessage" class="message" role="status"></div>
     </section>
 
+    <!-- Results and audit: anyone can load them after finalisation. Leave the ID empty for
+     the current election, or type an old ID to view past results. -->
     <section class="card">
       <h2>Published Results and Audit</h2>
       <p class="small">
@@ -166,17 +176,20 @@
         <button id="loadResultsButton" class="secondary">Load Results</button>
         <button id="loadAuditButton" class="secondary">Load Audit Records</button>
       </div>
-
+      
+      
       <p id="resultsStatus">Results have not been loaded.</p>
       <div id="resultsDisplay" class="result-box"></div>
       <div id="auditDisplay" class="result-box"></div>
     </section>
 
+    <!-- Footer -->
     <footer>
       <p>Developing Blockchain Applications — Assignment 3</p>
     </footer>
   </main>
 
+    <!-- Web3.js first, then my script, because my code needs Web3. -->
   <script src="web3.min.js"></script>
   <script src="application.js"></script>
 </body>

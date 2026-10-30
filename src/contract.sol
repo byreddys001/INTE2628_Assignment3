@@ -85,7 +85,7 @@ contract CommunityVoting {
     event ResultsFinalized(uint256 indexed electionId, bytes32 resultHash);
     event ElectionReset(uint256 indexed electionId);
 
-    // ---------- Access control ----------
+    //  Access control 
     // The checks live in internal functions so their code exists once, not in every function.
 
     function _onlyAdmin() internal view {
@@ -113,9 +113,7 @@ contract CommunityVoting {
         phase = Phase.Setup;
     }
 
-    // --------------------------------------------------
-    // ELECTION MANAGEMENT (Admin)
-    // --------------------------------------------------
+    // ELECTION MANAGEMENT (Admin only)
 
     /// @notice Start a new election. Only allowed when no election is active
     ///         (Setup or Finalized), so a running election can never be overwritten.
@@ -188,9 +186,7 @@ contract CommunityVoting {
         return "Results Finalized";
     }
 
-    // --------------------------------------------------
     // VOTER ELIGIBILITY (Admin, Commit phase only)
-    // --------------------------------------------------
 
     /// @notice Add a voter to the current election's whitelist.
     function addEligibleVoter(address voter)
@@ -238,9 +234,7 @@ contract CommunityVoting {
         return eligibleVoterList[electionId];
     }
 
-    // --------------------------------------------------
     // OPTIONAL EXCLUSION CONTROLS (Admin, Commit phase only)
-    // --------------------------------------------------
 
     /// @notice Block a voter from this election (cannot be done after they committed).
     function excludeVoter(address voter)
@@ -297,9 +291,8 @@ contract CommunityVoting {
         }
     }
 
-    // --------------------------------------------------
+    
     // COMMIT PHASE (voters)
-    // --------------------------------------------------
 
     /// @notice Submit a secret commitment instead of a plain vote.
     ///         commitment = keccak256(abi.encode(electionId, voter, optionIndex, salt)).
@@ -322,9 +315,7 @@ contract CommunityVoting {
         emit VoteCommitted(electionId, msg.sender, commitment);
     }
 
-    // --------------------------------------------------
     // REVEAL PHASE (voters) - validation and counting
-    // --------------------------------------------------
 
     /// @notice Open your commitment. The vote is counted only if the recomputed hash
     ///         matches the stored commitment, so changed or forged votes are rejected.
@@ -352,9 +343,9 @@ contract CommunityVoting {
         emit VoteRevealed(electionId, msg.sender);
     }
 
-    // --------------------------------------------------
+    
     // FINALISE AND PUBLISH RESULTS (Admin)
-    // --------------------------------------------------
+    
 
     /// @notice Publish results, the audit list and a result hash on-chain.
     ///         Voters who did not reveal are recorded as "not revealed" and not counted.
@@ -445,9 +436,9 @@ contract CommunityVoting {
         return keccak256(abi.encode(id, names, counts));
     }
 
-    // --------------------------------------------------
+    
     // RESULTS AND VERIFICATION (public, after finalisation)
-    // --------------------------------------------------
+    
 
     /// @dev Results and audit exist only for finalised elections.
     function _requireSaved(uint256 id) internal view {
@@ -523,10 +514,7 @@ contract CommunityVoting {
     }
 
     /// @notice On-chain consistency check of a published result. It confirms that:
-    ///         1) the audit list has one record per committed voter,
-    ///         2) the number of valid reveals in the audit matches the summary,
-    ///         3) the sum of option counts equals the number of valid reveals,
-    ///         4) the stored result hash matches the stored names and counts.
+    ///  the audit list has one record per committed voter,the number of valid reveals in the audit matches the summary, the sum of option counts equals the number of valid reveals, the stored result hash matches the stored names and counts.
     function verifyElectionResult(uint256 pastElectionId)
         external
         view
@@ -549,9 +537,9 @@ contract CommunityVoting {
             _resultHash(pastElectionId) == s.resultHash;
     }
 
-    // --------------------------------------------------
+    
     // INDIVIDUAL VOTER STATUS
-    // --------------------------------------------------
+    
 
     /// @notice Whether the caller has committed and revealed in the current election.
     function getMyVotingStatus()

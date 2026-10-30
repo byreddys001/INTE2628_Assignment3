@@ -4,18 +4,16 @@
 // NOTE: this file only presents data and sends transactions.
 // Every rule (roles, eligibility, phases, one vote each, vote
 // validation, counting) is enforced by the smart contract.
-// Buttons are never blocked by the page: if an action is not
-// allowed, the contract rejects it and its reason is shown.
 // ============================================================
 
-// Paste the address of your NEWLY deployed contract here.
-const CONTRACT_ADDRESS = "0xf8e81D47203A594245E36C48e151709F0C19fBe8";
+// Paste the address of your deployed contract address here.
+const CONTRACT_ADDRESS = "0x30a26C2845B7e43ea64D6Cd796F142F24E8B6B3C";
 const SEPOLIA_CHAIN_ID = 11155111;
 
 // Phase names exactly as returned by getVotingStatus() in the contract.
 const PHASES = ["Setup", "Commit Phase", "Reveal Phase", "Results Finalized"];
 
-// Minimal ABI: only the functions this page uses.
+// ABI for the contract, only the functions we call from the frontend.
 const ABI = [
   { "inputs": [], "name": "admin", "outputs": [{ "type": "address" }], "stateMutability": "view", "type": "function" },
   { "inputs": [], "name": "electionId", "outputs": [{ "type": "uint256" }], "stateMutability": "view", "type": "function" },
@@ -59,7 +57,7 @@ const ABI = [
   { "inputs": [{ "name": "pastElectionId", "type": "uint256" }], "name": "verifyElectionResult", "outputs": [{ "type": "bool" }], "stateMutability": "view", "type": "function" }
 ];
 
-// ---------- Page state ----------
+// Page state 
 let web3;
 let contract;
 let account = null;
@@ -103,7 +101,7 @@ function computeCommitment(id, voter, optionIndex, salt) {
   return web3.utils.keccak256(encoded);
 }
 
-// ---------- Clearing the screen ----------
+// Clearing the screen 
 function clearAccountScreen() {
   ["receiptDisplay", "voterMessage", "adminMessage", "globalMessage",
    "eligibleListResult", "excludedListResult", "auditDisplay", "resultsDisplay"]
@@ -134,7 +132,7 @@ function clearWalletScreen() {
   clearAccountScreen();
 }
 
-// ---------- Wallet connection ----------
+// Wallet connection 
 async function connectWallet() {
   try {
     if (!window.ethereum) {
@@ -163,7 +161,7 @@ async function connectWallet() {
   }
 }
 
-// ---------- Reload all data from the contract and update the page ----------
+//  Reload all data from the contract and update the page 
 async function refresh() {
   if (!contract || !account) return;
 
@@ -279,7 +277,7 @@ function renderOptions() {
   });
 }
 
-// ---------- Allowed / restricted guidance ----------
+//  Allowed / restricted guidance 
 function renderGuide(allowed, restricted) {
   const box = $("actionGuide");
   box.textContent = "";
@@ -363,7 +361,7 @@ function updateGuidance(status, eligible, excluded, committed, revealed) {
   renderGuide(allowed, restricted);
 }
 
-// ---------- Sending transactions through MetaMask ----------
+//  Sending transactions through MetaMask 
 async function send(method, successText, outputId) {
   try {
     message(outputId, "Waiting for MetaMask confirmation...");
@@ -378,7 +376,7 @@ async function send(method, successText, outputId) {
   }
 }
 
-// ---------- Admin: election management ----------
+//  Admin: election management 
 async function prepareElection() {
   if (needWallet("adminMessage")) return;
 
@@ -405,7 +403,7 @@ async function prepareElection() {
   }
 }
 
-// ---------- Admin: eligibility ----------
+// Admin: eligibility 
 async function manageEligibility(action) {
   if (needWallet("adminMessage")) return;
 
@@ -431,7 +429,7 @@ async function manageEligibility(action) {
   }
 }
 
-// ---------- Admin: exclusion ----------
+// Admin: exclusion
 async function manageExclusion(action) {
   if (needWallet("adminMessage")) return;
 
@@ -457,6 +455,7 @@ async function manageExclusion(action) {
   }
 }
 
+// loadEligible()
 async function loadEligible() {
   if (needWallet("eligibleListResult")) return;
 
@@ -470,6 +469,7 @@ async function loadEligible() {
   }
 }
 
+// loadExcluded()
 async function loadExcluded() {
   if (needWallet("excludedListResult")) return;
 
@@ -483,7 +483,7 @@ async function loadExcluded() {
   }
 }
 
-// ---------- Voter: commit phase ----------
+// Voter: commit phase 
 async function commitVote() {
   if (needWallet("voterMessage")) return;
 
@@ -534,7 +534,7 @@ async function commitVote() {
   }
 }
 
-// ---------- Voter: private receipt ----------
+// Voter: private receipt 
 function showPrivateReceipt() {
   if (needWallet("receiptDisplay")) return;
 
@@ -583,8 +583,7 @@ function downloadReceipt() {
   URL.revokeObjectURL(url);
 }
 
-// Restore a downloaded receipt. It must belong to this wallet and election,
-// and its commitment must match the hash recomputed from its own option and salt.
+// Restore a downloaded receipt. It must belong to this wallet and election, and its commitment must match the hash recomputed from its own option and salt.
 function importReceipt() {
   if (needWallet("voterMessage")) return;
 
@@ -615,7 +614,9 @@ function importReceipt() {
   }
 }
 
-// ---------- Voter: reveal phase ----------
+// Voter: reveal phase 
+// Reveal phase: send the option + salt from the receipt. The contract recomputes the hash and only counts the vote if it matches.
+
 async function revealMyVote() {
   if (needWallet("voterMessage")) return;
 
@@ -649,7 +650,9 @@ async function revealMyVote() {
   }
 }
 
-// ---------- Admin: lifecycle ----------
+// Admin: lifecycle 
+// Admin-only buttons. Non-admins can click but the contract rejects the action.
+
 async function endVoting() {
   if (needWallet("adminMessage")) return;
 
@@ -660,6 +663,7 @@ async function endVoting() {
   );
 }
 
+// Admin-only buttons. Non-admins can click but the contract rejects the action.
 async function finalise() {
   if (needWallet("adminMessage")) return;
 
@@ -670,6 +674,7 @@ async function finalise() {
   );
 }
 
+// Admin-only buttons. Non-admins can click but the contract rejects the action.
 async function resetElection() {
   if (needWallet("adminMessage")) return;
 
@@ -686,12 +691,14 @@ async function resetElection() {
   }
 }
 
-// ---------- Results and audit ----------
+// Results and audit
 function getRequestedElectionId() {
   const value = $("historyElectionId").value.trim();
   return value || electionId;
 }
 
+// loadResults()
+// from the contract,not from the page it also recalsculates the hash in web browser and compares it to the one on stored on-chain, and calls verifyElectionResult()
 async function loadResults() {
   if (needWallet("resultsDisplay")) return;
 
@@ -700,8 +707,8 @@ async function loadResults() {
   try {
     let names, counts, winners, result;
 
-    // Contract functions with several return values give an OBJECT in Web3.js, not an array,
-    // so they are read by name (or by index) instead of array destructuring.
+    // Contract functions with multiple return values give an OBJECT in Web3.js, not an array,
+    // and read by name/by index instead of array.
     if (requestedId === electionId && currentStatus === "Results Finalized") {
       result = await contract.methods.getResults().call();
       names = result.names ?? result[0];
@@ -725,10 +732,10 @@ async function loadResults() {
     const countedVotes = String(summary.countedVotes ?? summary[2]);
     const storedHash = String(summary.resultHash ?? summary[3]);
 
-    // Check 1: the contract re-verifies the audit list, counts and hash itself.
+    // Check 1: the contract re-verifies the audit list, counts and hash by itself.
     const contractVerified = await contract.methods.verifyElectionResult(requestedId).call();
 
-    // Check 2: recompute the hash in the browser from the displayed data and compare.
+    // Check 2: recomputes the hash in browser from the displayed data and compares.
     const localHash = web3.utils.keccak256(
       web3.eth.abi.encodeParameters(
         ["uint256", "string[]", "uint256[]"],
@@ -763,6 +770,8 @@ async function loadResults() {
   }
 }
 
+// loadAudit()
+// shows who has comitted and if they revealed commits, but doest show salt or choices
 async function loadAudit() {
   if (needWallet("auditDisplay")) return;
 
@@ -776,7 +785,7 @@ async function loadAudit() {
       return;
     }
 
-    // The audit lists participation only. Choices and salts are not published here.
+    // The audit lists participation only, the voters choices and salts are not published here.
     $("auditDisplay").textContent =
       `Audit records for election ${requestedId}\n\n` +
       Array.from(rows).map((row, index) => {
@@ -798,7 +807,7 @@ async function loadAudit() {
   }
 }
 
-// ---------- Button wiring ----------
+// Button wiring - hooks each button up to its function
 $("connectButton").addEventListener("click", connectWallet);
 $("prepareButton").addEventListener("click", prepareElection);
 
@@ -823,7 +832,9 @@ $("resetButton").addEventListener("click", resetElection);
 $("loadResultsButton").addEventListener("click", loadResults);
 $("loadAuditButton").addEventListener("click", loadAudit);
 
+// accountChanged
 // React to wallet changes.
+// Switching the accounts reloads the page.
 if (window.ethereum) {
   window.ethereum.on("accountsChanged", async accounts => {
     clearAccountScreen();

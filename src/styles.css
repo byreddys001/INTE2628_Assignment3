@@ -1,3 +1,4 @@
+/* Base styles: simple, clean layout. */
 * {
   box-sizing: border-box;
 }
@@ -69,6 +70,7 @@ label {
   margin-top: 12px;
 }
 
+/* Primary buttons. */
 input,
 textarea,
 button {
@@ -79,6 +81,8 @@ button {
   font: inherit;
 }
 
+
+/* Form fields and buttons */
 input,
 textarea {
   background: #fff;
@@ -143,6 +147,7 @@ button.secondary:hover:not(:disabled) {
   margin-right: 8px;
 }
 
+/* Message and result boxes: hidden when empty. */
 .message,
 .result-box {
   padding: 12px;
@@ -163,6 +168,7 @@ button.secondary:hover:not(:disabled) {
   word-break: break-word;
 }
 
+/* Admin panel. */
 #adminControls {
   border-left: 4px solid #2563eb;
 }
@@ -180,7 +186,7 @@ footer {
   padding: 20px 0;
 }
 
-/* ---------- Phase tracker ---------- */
+/* Phase tracker */
 .phase-track {
   margin-top: 14px;
   padding: 10px 12px;
@@ -197,7 +203,7 @@ footer {
   font-weight: 700;
 }
 
-/* ---------- Allowed / restricted guidance ---------- */
+/* Allowed / restricted guidance*/
 .guide-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -226,7 +232,7 @@ footer {
   border-color: #fecaca;
 }
 
-
+/* Mobile: tighter spacing and stacked buttons on small screens. */
 @media (max-width: 600px) {
   .container {
     margin: 16px auto;
